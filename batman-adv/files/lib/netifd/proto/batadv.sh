@@ -16,6 +16,7 @@ proto_batadv_setup() {
 	json_get_vars mesh
 
 	echo "$mesh" > "/sys/class/net/$iface/batman_adv/mesh_iface"
+	echo "enabled" > "/sys/class/net/$iface/batman_adv/no_rebroadcast"
 	proto_init_update "$iface" 1
 	proto_send_update "$config"
 }
