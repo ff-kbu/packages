@@ -59,17 +59,12 @@ function index()
 	entry(place,call("action_status_j"),"Status",0)
 	table.remove(place)
 
-	-- not visible
-	table.insert(place,"nodes_nojs")
-	entry(place, call("action_nodes"), nil)
-	table.remove(place)
-
 	--- nodes
 	table.insert(place,"Nodes")
 	entry(place,call("action_nodes_j"),"Nodes",1)
 	table.remove(place)
 
-		--- links
+	--- links
 	table.insert(place,"Links")
 	entry(place,call("action_links"),"Links",2).leaf = true
 	table.remove(place)
@@ -78,11 +73,6 @@ function index()
 	table.insert(place,"Tunnels")
 	entry(place,call("action_tunnels_j"), "Tunnels", 3).leaf = true
 	table.remove(place)
-
-	-- Gateways (deprecated)
-	--table.insert(place,"Gateways")
-	--entry(place,call("action_gateways_j"),"Gateways").leaf = true
-	--table.remove(place)
 
 	--- Chat
 	table.insert(place,"Chat")
@@ -131,51 +121,10 @@ function index()
 
 end
 
-function action_status()
-		local status = bmx6json.get("status").status or nil
-		local interfaces = bmx6json.get("interfaces").interfaces or nil
-
-		if status == nil or interfaces == nil then
-			luci.template.render("bmx6/error", {txt="Cannot fetch data from bmx6 json"})
-		else
-        	luci.template.render("bmx6/status", {status=status,interfaces=interfaces})
-		end
-end
-
 function action_status_j()
 	luci.template.render("bmx6/status_j", {})
 end
 
-
-function action_nodes()
-		local orig_list = bmx6json.get("originators").originators or nil
-
-		if orig_list == nil then
-			luci.template.render("bmx6/error", {txt="Cannot fetch data from bmx6 json"})
-			return nil
-		end
-
-		local originators = {}
-		local desc = nil
-		local orig = nil
-		local name = ""
-		local ipv4 = ""
-
-		for _,o in ipairs(orig_list) do
-			orig = bmx6json.get("originators/"..o.name) or {}
-			desc = bmx6json.get("descriptions/"..o.name) or {}
-
-			if string.find(o.name,'.') then
-				name = luci.util.split(o.name,'.')[1]
-			else
-				name = o.name
-			end
-
-			table.insert(originators,{name=name,orig=orig,desc=desc})
-		end
-
-        luci.template.render("bmx6/nodes", {originators=originators})
-end
 
 function action_nodes_j()
 	local http = require "luci.http"
@@ -192,7 +141,6 @@ function action_tunnels_j()
         luci.template.render("bmx6/tunnels_j", {})
 end
 
-
 function action_links(host)
 	local links = bmx6json.get("links", host)
 	local devlinks = {}
@@ -204,7 +152,7 @@ function action_links(host)
 			devlinks[l.viaDev] = {}
 		end
 		for _,l in ipairs(links) do
-			l.globalId = luci.util.split(l.globalId,'.')[1]
+			l.name = luci.util.split(l.name,'.')[1]
 			table.insert(devlinks[l.viaDev],l)
 		end
 	end
@@ -240,10 +188,10 @@ function action_topology()
 	    			if first then
 	    				first = false
 	    			else
-	    				topology = topology .. ', '
+						topology = topology .. ', '
 	    			end
 	    
-	    			topology = topology .. '{ "globalId": "%s", "links": [' %o.globalId:match("^[^%.]+")
+					topology = topology .. '{ "name": "%s", "links": [' %o.name
 	    
 	    			local first2 = true
 	    
@@ -252,10 +200,10 @@ function action_topology()
 	    					first2 = false
 	    				else
 	    					topology = topology .. ', '
-	    				end
-	    
-	    				topology = topology .. '{ "globalId": "%s", "rxRate": %s, "txRate": %s }'
-	    					%{ l.globalId:match("^[^%.]+"), l.rxRate, l.txRate }
+						end
+						name = l.name or l.llocalIp or "unknown"
+						topology = topology .. '{ "name": "%s", "rxRate": %s, "txRate": %s }'
+							%{ name, l.rxRate, l.txRate }
 	    
 	    			end
 	    

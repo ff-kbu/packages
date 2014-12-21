@@ -31,9 +31,10 @@ PKG_SOURCE_PROTO:=git
 #PKG_SOURCE_URL:=git://bmx6.net/bmx6.git
 PKG_SOURCE_URL:=git://github.com/axn/bmx6.git
 
-PKG_REV:=3b70f29a2326c8e829c5f10334d9bd4bc6ccab79
-PKG_VERSION:=r2013112701
+PKG_REV:=6a6195e46bf15ed58d75bdec14c2941aca31fc3f
+PKG_VERSION:=r2014112401
 PKG_RELEASE:=4
+PKG_LICENSE:=GPL-2.0
 
 PKG_SOURCE_VERSION:=$(PKG_REV)
 PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
@@ -91,11 +92,11 @@ define Package/bmx6-sms
   TITLE:=sms plugin
 endef
 
-define Package/bmx6-quagga
-  $(call Package/bmx6/Default)
-  DEPENDS:=bmx6 +qmp-quagga @BROKEN
-  TITLE:=bmx6 quagga plugin to redistribute/export routes (needs manet/bmx6 patched quagga 0.99.21)
-endef
+#define Package/bmx6-quagga
+#  $(call Package/bmx6/Default)
+#  DEPENDS:=bmx6 +qmp-quagga @BROKEN
+#  TITLE:=bmx6 quagga plugin to redistribute/export routes (needs manet/bmx6 patched quagga 0.99.21)
+#endef
 
 define Package/bmx6-table
   $(call Package/bmx6/Default)
@@ -142,14 +143,14 @@ define Package/bmx6-table/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/bmx6_table/bmx6_table.so $(1)/usr/lib/bmx6_table.so
 endef
 
-define Package/bmx6-quagga/install
-	$(INSTALL_DIR) $(1)/usr/lib
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/bmx6_quagga/bmx6_quagga.so $(1)/usr/lib/bmx6_quagga.so
-endef
+#define Package/bmx6-quagga/install
+#	$(INSTALL_DIR) $(1)/usr/lib
+#	$(INSTALL_BIN) $(PKG_BUILD_DIR)/lib/bmx6_quagga/bmx6_quagga.so $(1)/usr/lib/bmx6_quagga.so
+#endef
 
 $(eval $(call BuildPackage,bmx6))
 $(eval $(call BuildPackage,bmx6-uci-config))
 $(eval $(call BuildPackage,bmx6-json))
 $(eval $(call BuildPackage,bmx6-sms))
-$(eval $(call BuildPackage,bmx6-quagga))
+#$(eval $(call BuildPackage,bmx6-quagga))
 $(eval $(call BuildPackage,bmx6-table))
